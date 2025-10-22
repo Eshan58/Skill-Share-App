@@ -5,6 +5,9 @@ import Category from "../pages/Category";
 import errorPage from "../components/errorPage";
 import SkillDetail from "../pages/SkillDetail";
 import Booking from "../pages/Booking";
+import ProtectedRoute from "../components/ProtectedRoute";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 // import errorPage from "../pages/errorPage";
 
 const router = createBrowserRouter([
@@ -22,7 +25,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/skill/:skillId",
-        element: <SkillDetail></SkillDetail>,
+        element: (
+          <ProtectedRoute>
+            <SkillDetail></SkillDetail>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/login",
+        element: <Login></Login>,
+      },
+      {
+        path: "/Register",
+        element: <Register></Register>,
       },
     ],
   },

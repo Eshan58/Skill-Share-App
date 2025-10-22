@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import Home from "./Home";
+import SkillDetail from "./SkillDetail";
 
 const Category = () => {
   return (

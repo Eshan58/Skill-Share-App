@@ -23,7 +23,7 @@ const Booking = () => {
                 required
               />
 
-              <Link to="/">
+              <Link>
                 <button className="btn btn-neutral mt-4">Login</button>
               </Link>
               <Link to="/" className="btn mt-2 ">

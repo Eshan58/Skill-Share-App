@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import TopRatedProvider from "./TopRatedProvider";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -21,7 +22,7 @@ const Home = () => {
     fetchCategories();
   }, []);
 
-  const featuredCategories = categories.slice(0, 8);
+  const featuredCategories = categories.slice(0, 20);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -29,6 +30,7 @@ const Home = () => {
 
   return (
     <div>
+      <h1 className="m-3 text-3xl text-center">Skills</h1>
       <h1>Featured Skills ({featuredCategories.length})</h1>
       <div className="cards-container">
         {featuredCategories.map((category) => (
@@ -43,6 +45,11 @@ const Home = () => {
             </Link>
           </div>
         ))}
+      </div>
+      <div>
+        <div>
+          <TopRatedProvider></TopRatedProvider>
+        </div>
       </div>
     </div>
   );

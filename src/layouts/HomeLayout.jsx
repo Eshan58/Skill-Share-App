@@ -3,11 +3,12 @@ import { Outlet } from "react-router";
 import Header from "../components/Header";
 import LatestNews from "../components/LatestNews";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const HomeLayout = () => {
   return (
     <div>
-      <header>
+      <header className="w-11/12 mx-auto my-3">
         <Header></Header>
         <section className="w-11/12 mx-auto my-3">
           <LatestNews></LatestNews>
@@ -17,10 +18,13 @@ const HomeLayout = () => {
         </nav>
       </header>
       <main>
-        <section className="main">
+        <section className="w-11/12 mx-auto my-3">
           <Outlet></Outlet>
         </section>
       </main>
+      <footer className="w-11/12 mx-auto my-3">
+        <Footer></Footer>
+      </footer>
     </div>
   );
 };
