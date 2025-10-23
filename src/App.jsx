@@ -1,15 +1,13 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { RouterProvider } from "react-router-dom";
+import router from "./routes/router";
 import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
-
+  console.log("App component is rendering"); // Debug log
   return (
-    <>
-      <h1 className="text-6xl">let's build skill share app</h1>
-    </>
+    <div className="App">
+      <RouterProvider router={router} />
+    </div>
   );
 }
 

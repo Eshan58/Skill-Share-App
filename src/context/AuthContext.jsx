@@ -1,4 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db, googleProvider } from "../firebase/firebase.config";
 
 const AuthContext = createContext();
 
@@ -15,15 +25,40 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const userData = localStorage.getItem("userData");
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Get additional user data from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const userData = userDoc.data();
 
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    }
-    setLoading(false);
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            ...userData,
+          });
+        } catch (error) {
+          // If no user doc exists, just use auth user data
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          });
+        }
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return unsubscribe;
   }, []);
 
+  // Password validation function (client-side only)
   const validatePassword = (password) => {
     const errors = [];
 
@@ -45,6 +80,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (name, email, photoURL, password) => {
     try {
+      // Validate password
       const passwordValidation = validatePassword(password);
       if (!passwordValidation.isValid) {
         return {
@@ -53,76 +89,127 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-      const userExists = existingUsers.find((user) => user.email === email);
-
-      if (userExists) {
-        return { success: false, error: "User with this email already exists" };
-      }
-
-      const newUser = {
-        id: Date.now(),
-        name,
+      // Create user with Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Update profile with name and photo
+      await updateProfile(user, {
+        displayName: name,
+        photoURL: photoURL || "/images/default-avatar.jpg",
+      });
+
+      // Create user document in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
         photoURL: photoURL || "/images/default-avatar.jpg",
         createdAt: new Date().toISOString(),
-      };
-
-      existingUsers.push(newUser);
-      localStorage.setItem("users", JSON.stringify(existingUsers));
-
-      setUser(newUser);
-      localStorage.setItem("authToken", "fake-jwt-token");
-      localStorage.setItem("userData", JSON.stringify(newUser));
+        skills: [],
+        ratings: [],
+        studentsTaught: 0,
+      });
 
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      let errorMessage = "Signup failed. Please try again.";
+
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "This email is already registered.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address.";
+          break;
+        case "auth/weak-password":
+          errorMessage = "Password is too weak.";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+
+      return { success: false, error: errorMessage };
     }
   };
 
   const login = async (email, password) => {
     try {
-      const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-      const user = existingUsers.find((user) => user.email === email);
+      await signInWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch (error) {
+      let errorMessage = "Login failed. Please try again.";
 
-      if (user) {
-        setUser(user);
-        localStorage.setItem("authToken", "fake-jwt-token");
-        localStorage.setItem("userData", JSON.stringify(user));
-        return { success: true };
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "No user found with this email.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Invalid password.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address.";
+          break;
+        default:
+          errorMessage = error.message;
       }
 
-      return { success: false, error: "Invalid email or password" };
-    } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   };
 
   const googleLogin = async () => {
     try {
-      const googleUser = {
-        id: Date.now(),
-        name: "Google User",
-        email: "googleuser@example.com",
-        photoURL: "/images/google-avatar.jpg",
-        isGoogleUser: true,
-      };
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
 
-      setUser(googleUser);
-      localStorage.setItem("authToken", "fake-google-token");
-      localStorage.setItem("userData", JSON.stringify(googleUser));
+      // Check if user exists in Firestore, if not create them
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          createdAt: new Date().toISOString(),
+          skills: [],
+          ratings: [],
+          studentsTaught: 0,
+          isGoogleUser: true,
+        });
+      }
 
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      let errorMessage = "Google login failed. Please try again.";
+
+      switch (error.code) {
+        case "auth/popup-closed-by-user":
+          errorMessage = "Login cancelled.";
+          break;
+        case "auth/popup-blocked":
+          errorMessage =
+            "Popup was blocked. Please allow popups for this site.";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userData");
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const value = {

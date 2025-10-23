@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useLocation, useNavigate, Link } from "react-router";
+import { useLocation, useNavigate, Link, NavLink } from "react-router";
+import { FaGoogle } from "react-icons/fa";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -8,7 +9,6 @@ const Signup = () => {
     email: "",
     photoURL: "",
     password: "",
-    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -142,16 +142,18 @@ const Signup = () => {
               <div className="password-errors">
                 {passwordErrors.map((error, index) => (
                   <div key={index} className="password-error">
-                    • {error}
+                    {error}
                   </div>
                 ))}
               </div>
             )}
           </div>
 
+          {/* <NavLink to="/"> */}
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account"}
           </button>
+          {/* </NavLink> */}
         </form>
 
         <div className="auth-divider">
@@ -163,7 +165,7 @@ const Signup = () => {
           className="google-btn"
           disabled={loading}
         >
-          <img src="/images/google-icon.svg" alt="Google" />
+          <FaGoogle />
           Continue with Google
         </button>
 

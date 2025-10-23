@@ -14,7 +14,9 @@ const Header = () => {
               Log In
             </button> */}
           </h1>
-          <button className="btn btn-success text-2xl">My Profile</button>
+          <button className="btn btn-success text-2xl text-amber-50">
+            My Profile
+          </button>
         </div>
         <div className="flex justify-center flex-col items-center gap-3">
           <h1 className="animate__animated animate__backInDown text-7xl font-bold text-purple-500 mt-5">

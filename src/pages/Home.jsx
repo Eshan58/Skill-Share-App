@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import TopRatedProvider from "./TopRatedProvider";
+import { Link } from "react-router-dom"; 
+import TopRatedProviders from "../pages/TopRatedProvider";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  console.log("Home component is rendering");
+
   useEffect(() => {
+    console.log("Home useEffect running");
     const fetchCategories = async () => {
       try {
+        console.log("Fetching categories...")
         const response = await fetch("/skills.json");
+        console.log("Response:", response); 
         const data = await response.json();
+        console.log("Categories data:", data);
         setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -28,29 +34,29 @@ const Home = () => {
     return <div>Loading...</div>;
   }
 
+  console.log("Rendering categories:", featuredCategories.length); 
+
   return (
     <div>
-      <h1 className="m-3 text-3xl text-center">Skills</h1>
       <h1>Featured Skills ({featuredCategories.length})</h1>
       <div className="cards-container">
         {featuredCategories.map((category) => (
           <div key={category.skillId} className="card">
             <img src={category.image} alt={category.skillName} />
             <h3>{category.skillName}</h3>
-            <p>Rating: {category.rating}</p>
+            <p>⭐Rating: {category.rating}</p>
             <p>Price: ${category.price}</p>
-            {/* <p>Slots: {category.slotsAvailable}</p> */}
-            <Link to={`/skill/${category.skillId}`} className="show-more-btn">
+            <Link
+              to={`/skill/${category.skillId}`}
+              className="show-more-btn text-blue-500"
+            >
               Show More
             </Link>
           </div>
         ))}
       </div>
-      <div>
-        <div>
-          <TopRatedProvider></TopRatedProvider>
-        </div>
-      </div>
+
+      <TopRatedProviders />
     </div>
   );
 };

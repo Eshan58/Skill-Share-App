@@ -1,6 +1,5 @@
-// src/components/ProtectedRoute.jsx
 import { useAuth } from "../context/AuthContext";
-import { Navigate, useLocation } from "react-router";
+import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -16,7 +15,6 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    // Redirect to login page with return url
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

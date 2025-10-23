@@ -1,4 +1,3 @@
-// src/components/AuthNav.jsx
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router";
 
