@@ -1,14 +1,16 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
+  auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signOut,
   onAuthStateChanged,
-  updateProfile,
-} from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { auth, db, googleProvider } from "../firebase/firebase.config";
+  signOut,
+  updateProfile as firebaseUpdateProfile, // Renamed import to avoid conflict
+  googleProvider,
+} from "../firebase/firebase.config";
+import { doc, setDoc, updateDoc } from "firebase/firestore"; // Added updateDoc
+import { db } from "../firebase/firebase.config";
 
 const AuthContext = createContext();
 
@@ -23,194 +25,230 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [firestoreError, setFirestoreError] = useState(null);
 
-  useEffect(() => {
-    // Listen for authentication state changes
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Get additional user data from Firestore
-        try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          const userData = userDoc.data();
+  // Update profile function
+  const updateProfile = async (profileData) => {
+    try {
+      setFirestoreError(null);
+      const currentUser = auth.currentUser;
 
-          setUser({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            ...userData,
-          });
-        } catch (error) {
-          // If no user doc exists, just use auth user data
-          setUser({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          });
-        }
-      } else {
-        setUser(null);
+      if (!currentUser) {
+        throw new Error("No user is currently signed in");
       }
+
+      // Update profile in Firebase Authentication
+      await firebaseUpdateProfile(currentUser, {
+        displayName: profileData.displayName,
+        photoURL: profileData.photoURL,
+      });
+
+      // Update the user state with new data
+      setUser({
+        ...currentUser,
+        displayName: profileData.displayName,
+        photoURL: profileData.photoURL,
+      });
+
+      // Try to update user document in Firestore
+      try {
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          displayName: profileData.displayName,
+          photoURL: profileData.photoURL,
+          updatedAt: new Date(),
+        });
+      } catch (firestoreError) {
+        console.warn("Firestore update failed:", firestoreError);
+        setFirestoreError(
+          "Note: Profile updated, but some features may not work due to database connection issues."
+        );
+      }
+
+      return { success: true, user: currentUser };
+    } catch (error) {
+      console.error("Update profile error:", error);
+
+      let errorMessage = "Failed to update profile";
+
+      switch (error.code) {
+        case "auth/requires-recent-login":
+          errorMessage = "Please log in again to update your profile";
+          break;
+        case "auth/network-request-failed":
+          errorMessage =
+            "Network error. Please check your internet connection.";
+          break;
+        default:
+          errorMessage = error.message || "Failed to update profile";
+      }
+
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Sign up with email and password
+  const signup = async (email, password, displayName, photoURL = null) => {
+    try {
+      setFirestoreError(null);
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = result.user;
+
+      // Update profile
+      if (displayName || photoURL) {
+        await firebaseUpdateProfile(user, {
+          // Use the renamed import
+          displayName: displayName,
+          photoURL: photoURL || null,
+        });
+      }
+
+      // Try to create user document in Firestore
+      try {
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          displayName: displayName,
+          email: email,
+          photoURL: photoURL,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } catch (firestoreError) {
+        console.warn("Firestore write failed:", firestoreError);
+        setFirestoreError(
+          "Note: Some features may not work due to database connection issues."
+        );
+      }
+
+      return { success: true, user: user };
+    } catch (error) {
+      let errorMessage = "Signup failed";
+
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "Email already in use";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address";
+          break;
+        case "auth/weak-password":
+          errorMessage = "Password should be at least 6 characters";
+          break;
+        case "auth/operation-not-allowed":
+          errorMessage = "Email/password sign-up is not enabled";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Login with email and password
+  const login = async (email, password) => {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.log("Firebase login error:", error.code, error.message);
+
+      let errorMessage = "Login failed";
+
+      switch (error.code) {
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address";
+          break;
+        case "auth/user-disabled":
+          errorMessage = "This account has been disabled";
+          break;
+        case "auth/user-not-found":
+          errorMessage = "No account found with this email";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password";
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Please try again later.";
+          break;
+        case "auth/operation-not-allowed":
+          errorMessage =
+            "Email/password login is not enabled. Please contact support.";
+          break;
+        case "auth/network-request-failed":
+          errorMessage =
+            "Network error. Please check your internet connection.";
+          break;
+        case "auth/invalid-credential":
+          errorMessage = "Invalid login credentials";
+          break;
+        default:
+          errorMessage = `Login error: ${error.message}`;
+      }
+
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Google login
+  const googleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.log("Google login error:", error.code, error.message);
+
+      let errorMessage = "Google login failed";
+
+      switch (error.code) {
+        case "auth/popup-closed-by-user":
+          errorMessage = "Login cancelled";
+          break;
+        case "auth/popup-blocked":
+          errorMessage =
+            "Popup was blocked by your browser. Please allow popups for this site.";
+          break;
+        case "auth/unauthorized-domain":
+          errorMessage = "This domain is not authorized for login.";
+          break;
+        case "auth/network-request-failed":
+          errorMessage =
+            "Network error. Please check your internet connection.";
+          break;
+        case "auth/internal-error":
+          errorMessage = "Internal authentication error. Please try again.";
+          break;
+        default:
+          errorMessage = `Google login error: ${error.message}`;
+      }
+
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Logout function
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      return { success: true };
+    } catch (error) {
+      console.error("Logout error:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Auth state listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
     });
 
     return unsubscribe;
   }, []);
-
-  // Password validation function (client-side only)
-  const validatePassword = (password) => {
-    const errors = [];
-
-    if (password.length < 6) {
-      errors.push("Password must be at least 6 characters long");
-    }
-    if (!/[A-Z]/.test(password)) {
-      errors.push("Password must contain at least one uppercase letter");
-    }
-    if (!/[a-z]/.test(password)) {
-      errors.push("Password must contain at least one lowercase letter");
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
-  };
-
-  const signup = async (name, email, photoURL, password) => {
-    try {
-      // Validate password
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.isValid) {
-        return {
-          success: false,
-          error: passwordValidation.errors.join(", "),
-        };
-      }
-
-      // Create user with Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      // Update profile with name and photo
-      await updateProfile(user, {
-        displayName: name,
-        photoURL: photoURL || "/images/default-avatar.jpg",
-      });
-
-      // Create user document in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        name: name,
-        email: email,
-        photoURL: photoURL || "/images/default-avatar.jpg",
-        createdAt: new Date().toISOString(),
-        skills: [],
-        ratings: [],
-        studentsTaught: 0,
-      });
-
-      return { success: true };
-    } catch (error) {
-      let errorMessage = "Signup failed. Please try again.";
-
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          errorMessage = "This email is already registered.";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address.";
-          break;
-        case "auth/weak-password":
-          errorMessage = "Password is too weak.";
-          break;
-        default:
-          errorMessage = error.message;
-      }
-
-      return { success: false, error: errorMessage };
-    }
-  };
-
-  const login = async (email, password) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      return { success: true };
-    } catch (error) {
-      let errorMessage = "Login failed. Please try again.";
-
-      switch (error.code) {
-        case "auth/user-not-found":
-          errorMessage = "No user found with this email.";
-          break;
-        case "auth/wrong-password":
-          errorMessage = "Invalid password.";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address.";
-          break;
-        default:
-          errorMessage = error.message;
-      }
-
-      return { success: false, error: errorMessage };
-    }
-  };
-
-  const googleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      // Check if user exists in Firestore, if not create them
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (!userDoc.exists()) {
-        await setDoc(doc(db, "users", user.uid), {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          createdAt: new Date().toISOString(),
-          skills: [],
-          ratings: [],
-          studentsTaught: 0,
-          isGoogleUser: true,
-        });
-      }
-
-      return { success: true };
-    } catch (error) {
-      let errorMessage = "Google login failed. Please try again.";
-
-      switch (error.code) {
-        case "auth/popup-closed-by-user":
-          errorMessage = "Login cancelled.";
-          break;
-        case "auth/popup-blocked":
-          errorMessage =
-            "Popup was blocked. Please allow popups for this site.";
-          break;
-        default:
-          errorMessage = error.message;
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-      };
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
 
   const value = {
     user,
@@ -218,8 +256,9 @@ export const AuthProvider = ({ children }) => {
     login,
     googleLogin,
     logout,
+    updateProfile, // Added the updateProfile function
     loading,
-    validatePassword,
+    firestoreError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

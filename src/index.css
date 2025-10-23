@@ -1194,3 +1194,360 @@
     transform: rotate(360deg);
   }
 }
+.password-errors {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff3cd;
+  border-radius: 4px;
+  border: 1px solid #ffeaa7;
+}
+
+.password-error {
+  color: #856404;
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+/* Update your existing auth styles if needed */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.auth-btn,
+.google-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.auth-btn {
+  background: #007bff;
+  color: white;
+}
+
+.auth-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid #fcc;
+}
+/* Add to your main CSS file */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.auth-card p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.form-group input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.password-errors {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff3cd;
+  border-radius: 4px;
+  border: 1px solid #ffeaa7;
+}
+
+.password-error {
+  color: #856404;
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.auth-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.auth-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+}
+
+.auth-divider span {
+  background: white;
+  padding: 0 1rem;
+  color: #666;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.google-btn:hover:not(:disabled) {
+  background: #f8f9fa;
+}
+
+.google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid #fcc;
+}
+
+.auth-links {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.auth-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+.password-errors {
+  margin-top: 8px;
+  padding: 12px;
+  background: #fff3cd;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+  font-size: 14px;
+}
+
+.password-errors strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #856404;
+}
+
+.password-error {
+  color: #856404;
+  font-size: 13px;
+  margin: 4px 0;
+  padding-left: 8px;
+}
+
+/* Toastify overrides if needed */
+.Toastify__toast--error {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.Toastify__toast--success {
+  background: #efe;
+  color: #363;
+  border: 1px solid #cfc;
+}
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-container input {
+  padding-right: 45px; /* Space for the toggle button */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #333;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.or-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: #ccc; /* or any color you prefer */
+}
+
+.or-text {
+  padding: 0 10px;
+  color: #666; /* or any color */
+}
+.form-container {
+  width: 100%;
+  max-width: 400px; /* Preforms from getting too wide */
+  margin: 0 auto;
+  padding: 20px;
+}
+.form-field {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}

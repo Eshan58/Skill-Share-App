@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useLocation, useNavigate, Link } from "react-router";
-import { FaEyeSlash } from "react-icons/fa";
-import { FaEye } from "react-icons/fa";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { FaGoogle } from "react-icons/fa";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +11,6 @@ const Login = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const { login, googleLogin } = useAuth();
   const location = useLocation();
@@ -25,57 +24,74 @@ const Login = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
-    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
-    // Basic validation
     if (!formData.email || !formData.password) {
-      setError("Please fill in all fields");
+      toast.error("Please fill in all fields");
       setLoading(false);
       return;
     }
 
-    const result = await login(formData.email, formData.password);
+    try {
+      const result = await login(formData.email, formData.password);
 
-    if (result.success) {
-      navigate(from, { replace: true });
-    } else {
-      setError(result.error);
+      if (result.success) {
+        toast.success("Logged in successfully!");
+        navigate(from, { replace: true });
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    setError("");
 
-    const result = await googleLogin();
+    try {
+      const result = await googleLogin();
 
-    if (result.success) {
-      navigate(from, { replace: true });
-    } else {
-      setError(result.error);
+      if (result.success) {
+        toast.success("Logged in successfully!");
+        navigate(from, { replace: true });
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error("Google login failed");
+      console.error("Google login error:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const handleForgotPassword = () => {
+    if (formData.email) {
+      // Navigate to forgot password page with email as state
+      navigate("/forgot-password", { state: { email: formData.email } });
+    } else {
+      // Navigate without email
+      navigate("/forgot-password");
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Welcome Back</h2>
-        <p>Please login to view skill details</p>
-
-        {error && <div className="error-message">{error}</div>}
+        <h2>Login to Your Account</h2>
+        <p>Welcome back! Please log in to continue.</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email *</label>
             <input
               type="email"
               id="email"
@@ -89,27 +105,26 @@ const Login = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <div className="password-input-container">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                required
-                disabled={loading}
-              />
+            <div className="flex justify-between items-center">
+              <label htmlFor="password">Password *</label>
               <button
                 type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
+                onClick={handleForgotPassword}
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                Forgot Password?
               </button>
             </div>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              required
+              disabled={loading}
+            />
           </div>
 
           <button type="submit" className="auth-btn" disabled={loading}>
@@ -126,8 +141,8 @@ const Login = () => {
           className="google-btn"
           disabled={loading}
         >
-          
-          Continue with Google
+          <FaGoogle />
+          {loading ? "Signing in..." : "Continue with Google"}
         </button>
 
         <div className="auth-links">
@@ -138,12 +153,12 @@ const Login = () => {
             </Link>
           </p>
         </div>
-
-        <div className="demo-info">
-          <p className="text-sm text-gray-600 text-center">
-            <strong>Note:</strong> No email verification required. You can use
-            any valid email.
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+          <p className="text-sm font-medium text-gray-700">Demo Account:</p>
+          <p className="text-sm text-gray-600">
+            Email: islameshan451@gmail.com
           </p>
+          <p className="text-sm text-gray-600">Password: ASdf12!</p>
         </div>
       </div>
     </div>

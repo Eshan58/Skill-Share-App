@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useLocation, useNavigate, Link, NavLink } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { FaGoogle } from "react-icons/fa";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -9,16 +11,13 @@ const Signup = () => {
     email: "",
     photoURL: "",
     password: "",
+    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState([]);
 
   const { signup, googleLogin, validatePassword } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
-
-  const from = location.state?.from?.pathname || "/";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,48 +35,71 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+    // Basic validation
+    if (!formData.name?.trim() || !formData.email?.trim() || !formData.password || !formData.confirmPassword) {
+      toast.error("Please fill in all required fields");
       setLoading(false);
       return;
     }
 
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Validate password strength
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
-      setError(passwordValidation.errors.join(", "));
+      toast.error("Please fix password requirements: " + passwordValidation.errors.join(", "));
       setLoading(false);
       return;
     }
 
-    const result = await signup(
-      formData.name,
-      formData.email,
-      formData.photoURL,
-      formData.password
-    );
+    try {
+      const result = await signup(
+        formData.name.trim(),
+        formData.email.trim(),
+        formData.photoURL?.trim() || "",
+        formData.password
+      );
 
-    if (result.success) {
-      navigate(from, { replace: true });
-    } else {
-      setError(result.error);
+      if (result.success) {
+        toast.success("Account created successfully!");
+        // FIXED: Always navigate to home page
+        navigate("/", { replace: true });
+      } else {
+        toast.error(result.error || "Signup failed");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    setError("");
 
-    const result = await googleLogin();
+    try {
+      const result = await googleLogin();
 
-    if (result.success) {
-      navigate(from, { replace: true });
-    } else {
-      setError(result.error);
+      if (result.success) {
+        toast.success("Logged in successfully!");
+        // FIXED: Google login also goes to home page
+        navigate("/", { replace: true });
+      } else {
+        toast.error(result.error || "Google login failed");
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error("Google login failed");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -86,11 +108,9 @@ const Signup = () => {
         <h2>Create Your Account</h2>
         <p>Join our community of skilled learners</p>
 
-        {error && <div className="error-message">{error}</div>}
-
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Full Name</label>
+            <label htmlFor="name">Full Name *</label>
             <input
               type="text"
               id="name"
@@ -99,11 +119,12 @@ const Signup = () => {
               onChange={handleChange}
               placeholder="Enter your full name"
               required
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email *</label>
             <input
               type="email"
               id="email"
@@ -112,6 +133,7 @@ const Signup = () => {
               onChange={handleChange}
               placeholder="Enter your email"
               required
+              disabled={loading}
             />
           </div>
 
@@ -123,12 +145,13 @@ const Signup = () => {
               name="photoURL"
               value={formData.photoURL}
               onChange={handleChange}
-              placeholder="Image url"
+              placeholder="https://example.com/photo.jpg"
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Password *</label>
             <input
               type="password"
               id="password"
@@ -137,23 +160,41 @@ const Signup = () => {
               onChange={handleChange}
               placeholder="Enter your password"
               required
+              disabled={loading}
             />
             {passwordErrors.length > 0 && (
               <div className="password-errors">
+                <strong>Password must contain:</strong>
                 {passwordErrors.map((error, index) => (
                   <div key={index} className="password-error">
-                    {error}
+                    • {error}
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* <NavLink to="/"> */}
-          <button type="submit" className="auth-btn" disabled={loading}>
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password *</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="auth-btn"
+            disabled={loading || passwordErrors.length > 0}
+          >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
-          {/* </NavLink> */}
         </form>
 
         <div className="auth-divider">
@@ -166,7 +207,7 @@ const Signup = () => {
           disabled={loading}
         >
           <FaGoogle />
-          Continue with Google
+          {loading ? "Signing in..." : "Continue with Google"}
         </button>
 
         <div className="auth-links">
