@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, Link } from "react-router";
+import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -8,17 +9,11 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { user, login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const from = location.state?.from?.pathname || "/";
-
-  useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,15 +22,31 @@ const Login = () => {
 
     const result = await login(email, password);
 
-    if (!result.success) {
+    if (result.success) {
+      navigate(from, { replace: true });
+    } else {
       setError(result.error || "Login failed");
     }
     setLoading(false);
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError("");
+
+    const result = await googleLogin();
+
+    if (result.success) {
+      navigate(from, { replace: true });
+    } else {
+      setError(result.error);
+    }
+    setLoading(false);
+  };
+
   return (
-    <div className="login-container">
-      <div className="login-card">
+    <div className="auth-container">
+      <div className="auth-card">
         <h2>Welcome Back</h2>
         <p>Please login to view skill details</p>
 
@@ -66,17 +77,32 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="login-btn " disabled={loading}>
+          <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
+        </form>
+
+        <div className="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <button
+          onClick={handleGoogleLogin}
+          className="google-btn"
+          disabled={loading}
+        >
+          <FaGoogle />
+          Continue with Google
+        </button>
+
+        <div className="auth-links">
           <p>
-            Is There Your First Time Please
-            <Link to="/Register" className="text-blue-500">
-              {" "}
-              Register
+            Don't have an account?{" "}
+            <Link to="/signup" className="auth-link">
+              Sign up here
             </Link>
           </p>
-        </form>
+        </div>
       </div>
     </div>
   );

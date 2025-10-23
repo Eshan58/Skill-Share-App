@@ -7,7 +7,8 @@ import SkillDetail from "../pages/SkillDetail";
 import Booking from "../pages/Booking";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Login from "../pages/Login";
-import Register from "../pages/Register";
+// import Register from "../pages/Signup";
+import Signup from "../pages/Signup";
 // import errorPage from "../pages/errorPage";
 
 const router = createBrowserRouter([
@@ -35,11 +36,15 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login></Login>,
       },
-      {
-        path: "/Register",
-        element: <Register></Register>,
-      },
+      // {
+      //   path: "/Register",
+      //   element: <Register></Register>,
+      // },
     ],
+  },
+  {
+    path: "/signup",
+    element: <Signup></Signup>,
   },
   {
     path: "/Book",
