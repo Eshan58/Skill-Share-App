@@ -97,7 +97,7 @@
   },
   {
     "skillId": 9,
-    "skillName": "Graphic Design Principles",
+    "skillName": "Graphic Design",
     "providerName": "Emma Thompson",
     "providerEmail": "emma@skillswap.com",
     "price": 32,
@@ -121,7 +121,7 @@
   },
   {
     "skillId": 11,
-    "skillName": "Gardening for Urban Spaces",
+    "skillName": "Gardening for Urban",
     "providerName": "Lisa Park",
     "providerEmail": "lisa@skillswap.com",
     "price": 12,
@@ -133,7 +133,7 @@
   },
   {
     "skillId": 12,
-    "skillName": "Meditation and Mindfulness",
+    "skillName": "Meditation Mindfulness",
     "providerName": "Raj Patel",
     "providerEmail": "raj@skillswap.com",
     "price": 14,
@@ -145,7 +145,7 @@
   },
   {
     "skillId": 13,
-    "skillName": "Spanish Conversation Practice",
+    "skillName": "Spanish Conversation",
     "providerName": "Carlos Mendez",
     "providerEmail": "carlos@skillswap.com",
     "price": 16,
@@ -181,7 +181,7 @@
   },
   {
     "skillId": 16,
-    "skillName": "Social Media Content Creation",
+    "skillName": "Social Media Content",
     "providerName": "Olivia Martinez",
     "providerEmail": "olivia@skillswap.com",
     "price": 21,
@@ -193,7 +193,7 @@
   },
   {
     "skillId": 17,
-    "skillName": "Creative Writing Workshop",
+    "skillName": "Creative Writing ",
     "providerName": "Amanda Foster",
     "providerEmail": "amanda@skillswap.com",
     "price": 17,
@@ -217,7 +217,7 @@
   },
   {
     "skillId": 19,
-    "skillName": "Personal Branding Workshop",
+    "skillName": "Personal Branding ",
     "providerName": "Sophia Williams",
     "providerEmail": "sophia@skillswap.com",
     "price": 27,
