@@ -49,10 +49,10 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      {
-        path: "/AboutDetails",
-        element: <h2>news layout</h2>,
-      },
+      // {
+      //   path: "/AboutDetails",
+      //   element: <h2>news layout</h2>,
+      // },
       {
         path: "/profile",
         element: (

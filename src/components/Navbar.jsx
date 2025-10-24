@@ -23,7 +23,7 @@ const Navbar = () => {
         >
           Home
         </NavLink>
-        <NavLink
+        {/* <NavLink
           className={({ isActive }) =>
             `font-medium transition duration-200 px-3 py-2 rounded-lg ${
               isActive
@@ -34,7 +34,7 @@ const Navbar = () => {
           to="/AboutDetails"
         >
           About
-        </NavLink>
+        </NavLink> */}
       </div>
 
       <div className="flex items-center gap-4">
