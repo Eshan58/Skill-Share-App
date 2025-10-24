@@ -6,10 +6,10 @@ import {
   signInWithPopup,
   onAuthStateChanged,
   signOut,
-  updateProfile as firebaseUpdateProfile, // Renamed import to avoid conflict
+  updateProfile as firebaseUpdateProfile, 
   googleProvider,
 } from "../firebase/firebase.config";
-import { doc, setDoc, updateDoc } from "firebase/firestore"; // Added updateDoc
+import { doc, setDoc, updateDoc } from "firebase/firestore"; 
 import { db } from "../firebase/firebase.config";
 
 const AuthContext = createContext();
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, user: currentUser };
     } catch (error) {
-      console.error("Update profile error:", error);
+      // console.error("Update profile error:", error);
 
       let errorMessage = "Failed to update profile";
 
@@ -154,7 +154,7 @@ export const AuthProvider = ({ children }) => {
       const result = await signInWithEmailAndPassword(auth, email, password);
       return { success: true, user: result.user };
     } catch (error) {
-      console.log("Firebase login error:", error.code, error.message);
+      // console.log("Firebase login error:", error.code, error.message);
 
       let errorMessage = "Login failed";
 
@@ -199,7 +199,7 @@ export const AuthProvider = ({ children }) => {
       const result = await signInWithPopup(auth, googleProvider);
       return { success: true, user: result.user };
     } catch (error) {
-      console.log("Google login error:", error.code, error.message);
+      // console.log("Google login error:", error.code, error.message);
 
       let errorMessage = "Google login failed";
 
@@ -235,7 +235,7 @@ export const AuthProvider = ({ children }) => {
       await signOut(auth);
       return { success: true };
     } catch (error) {
-      console.error("Logout error:", error);
+      // console.error("Logout error:", error);
       return { success: false, error: error.message };
     }
   };
@@ -256,7 +256,7 @@ export const AuthProvider = ({ children }) => {
     login,
     googleLogin,
     logout,
-    updateProfile, // Added the updateProfile function
+    updateProfile,
     loading,
     firestoreError,
   };

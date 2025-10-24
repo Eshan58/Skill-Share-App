@@ -6,17 +6,17 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.log("Home component is rendering");
+  // console.log("Home component is rendering");
 
   useEffect(() => {
-    console.log("Home useEffect running");
+    // console.log("Home useEffect running");
     const fetchCategories = async () => {
       try {
-        console.log("Fetching categories...")
+        // console.log("Fetching categories...")
         const response = await fetch("/skills.json");
-        console.log("Response:", response); 
+        // console.log("Response:", response); 
         const data = await response.json();
-        console.log("Categories data:", data);
+        // console.log("Categories data:", data);
         setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -34,7 +34,7 @@ const Home = () => {
     return <div>Loading...</div>;
   }
 
-  console.log("Rendering categories:", featuredCategories.length); 
+  // console.log("Rendering categories:", featuredCategories.length); 
 
   return (
     <div>
