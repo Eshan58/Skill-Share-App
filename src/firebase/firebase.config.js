@@ -1,47 +1,40 @@
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
-  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signOut,
   updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAzUAbW0luDfSRseVt4-qnWpwmwxRU2u00",
+  authDomain: "skill-share-app-2025.firebaseapp.com",
+  projectId: "skill-share-app-2025",
+  storageBucket: "skill-share-app-2025.firebasestorage.app",
+  messagingSenderId: "838028493378",
+  appId: "1:838028493378:web:6fe796a625ca91b960a3db",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Create and export googleProvider instance
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: "select_account",
-});
-
-// Export all Firebase functions
 export {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signOut,
   updateProfile,
+  sendPasswordResetEmail,
 };
 
-export default app;
+export const googleProvider = new GoogleAuthProvider();
