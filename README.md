@@ -1,16 +1,25 @@
-# React + Vite
+Project name : Skill-Share-App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Purpose : Our platform connects skilled learners with opportunities to grow and showcase their talents. Create your profile, demonstrate your expertise through projects and challenges, and get recognized by a community that values continuous learning and professional development. Whether you're looking to enhance your skills, collaborate on meaningful projects, or advance your career, we provide the tools and community support to help you achieve your goals.      
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Live URL : https://skill-share-app-2025.web.app/
 
-## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Key features : Our platfrom have lots of features but best features is any can learn his/her dream skill from any wear by using our platfrom.
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+to build this platfrom i use lot's of npm packages : 
+        tailwindcss/vite
+        animate.css
+        daisyui
+        date-fns
+        firebase
+        react
+        react-dom
+        react-fast-marquee
+        react-icons
+        react-router
+        react-router-dom
+        react-toastify
+        tailwindcss
